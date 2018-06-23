@@ -1,0 +1,11 @@
+1. 运行 docker-compose.yml
+    $ docker-compose up
+
+
+2. 验证
+    $ docker exec -it 1de7420a1a5f redis-cli
+    > set foo ball
+    OK
+    > get foo
+    "ball"
+

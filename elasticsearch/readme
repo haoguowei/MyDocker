@@ -1,4 +1,4 @@
-1. 运行ELK docker-compose
+1. 运行 docker-compose.yml
     $ docker-compose up
 
 
