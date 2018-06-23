@@ -1,0 +1,75 @@
+version : "3"
+services :
+        redis-1 :
+                image : redis:4.0
+                volumes :
+                        - ./data-1:/data
+                        - ./redis.conf:/redis.conf
+                command : redis-server /redis.conf
+                ports :
+                        - 6379
+                networks :
+                    redis_net :
+                        ipv4_address : 172.14.238.101
+        redis-2 :
+                image : redis:4.0
+                volumes :
+                        - ./data-2:/data
+                        - ./redis.conf:/redis.conf
+                command : redis-server /redis.conf
+                ports :
+                        - 6379
+                networks :
+                    redis_net :
+                        ipv4_address : 172.14.238.102
+        redis-3 :
+                image : redis:4.0
+                volumes :
+                        - ./data-3:/data
+                        - ./redis.conf:/redis.conf
+                command : redis-server /redis.conf
+                ports :
+                        - 6379
+                networks :
+                    redis_net :
+                        ipv4_address : 172.14.238.103
+        redis-4 :
+                image : redis:4.0
+                volumes :
+                        - ./data-4:/data
+                        - ./redis.conf:/redis.conf
+                command : redis-server /redis.conf
+                ports :
+                        - 6379
+                networks :
+                    redis_net :
+                        ipv4_address : 172.14.238.104
+        redis-5 :
+                image : redis:4.0
+                volumes :
+                        - ./data-5:/data
+                        - ./redis.conf:/redis.conf
+                command : redis-server /redis.conf
+                ports :
+                        - 6379
+                networks :
+                    redis_net :
+                        ipv4_address : 172.14.238.105
+        redis-6 :
+                image : redis:4.0
+                volumes :
+                        - ./data-6:/data
+                        - ./redis.conf:/redis.conf
+                command : redis-server /redis.conf
+                ports :
+                        - 6379
+                networks :
+                    redis_net :
+                        ipv4_address : 172.14.238.106
+networks :
+        redis_net :
+                driver : bridge
+                ipam :
+                        driver : default
+                        config :
+                        - subnet : 172.14.238.0/24
