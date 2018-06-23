@@ -3,7 +3,7 @@
     && wget http://download.redis.io/redis-stable/src/redis-trib.rb \
     && ruby redis-trib.rb create --replicas 1 \
      172.14.238.101:6379 172.14.238.102:6379 172.14.238.103:6379 \
-     172.14.238.104:6379 172.14.238.105:6379 172.14.238.106:6379
+     172.14.238.104:6379 172.14.238.105:6379 172.14.238.106:6379'
 
 
      [OK] All 16384 slots covered
