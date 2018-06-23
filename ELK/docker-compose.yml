@@ -1,0 +1,50 @@
+version : "3"
+services :
+        elasticsearch1 :
+                image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
+                volumes :
+                        - "./es-data1:/usr/share/elasticsearch/data"
+                environment :
+                        - cluster.name=elk-cluster
+                        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+                ports :
+                        - 9200:9200
+                networks :
+                        - elk_net
+        elasticsearch2 :
+                image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
+                volumes :
+                        - "./es-data2:/usr/share/elasticsearch/data"
+                environment :
+                        - cluster.name=elk-cluster
+                        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+                        - "discovery.zen.ping.unicast.hosts=elasticsearch1"
+                networks :
+                        - elk_net
+        elasticsearch3 :
+                image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
+                volumes :
+                        - "./es-data3:/usr/share/elasticsearch/data"
+                environment :
+                        - cluster.name=elk-cluster
+                        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+                        - "discovery.zen.ping.unicast.hosts=elasticsearch1"
+                networks :
+                        - elk_net
+        kibana :
+                image : hub.c.163.com/haoyoyo/kibana:6.3.0
+                environment :
+                    ELASTICSEARCH_URL : http://elasticsearch1:9200
+                ports :
+                        - 5601:5601
+                depends_on :
+                        - elasticsearch1
+                networks :
+                        - elk_net
+networks :
+        elk_net :
+                driver : bridge
+                ipam :
+                        driver : default
+                        config :
+                        - subnet : 172.16.238.0/24

@@ -1,0 +1,40 @@
+version : "3"
+services :
+        elasticsearch1 :
+                image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
+                volumes :
+                        - "./es-data1:/usr/share/elasticsearch/data"
+                environment :
+                        - cluster.name=elasticsearch-cluster
+                        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+                ports :
+                        - 9200:9200
+                networks :
+                        - es_net
+        elasticsearch2 :
+                image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
+                volumes :
+                        - "./es-data2:/usr/share/elasticsearch/data"
+                environment :
+                        - cluster.name=elasticsearch-cluster
+                        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+                        - "discovery.zen.ping.unicast.hosts=elasticsearch1"
+                networks :
+                        - es_net
+        elasticsearch3 :
+                image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
+                volumes :
+                        - "./es-data3:/usr/share/elasticsearch/data"
+                environment :
+                        - cluster.name=elasticsearch-cluster
+                        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+                        - "discovery.zen.ping.unicast.hosts=elasticsearch1"
+                networks :
+                        - es_net
+networks :
+        es_net :
+                driver : bridge
+                ipam : 
+                        driver : default
+                        config : 
+                        - subnet : 172.15.238.0/24

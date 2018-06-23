@@ -1,0 +1,30 @@
+1. Dockerfile
+
+    ==================================================================================================
+
+    FROM java:8
+    MAINTAINER haoguowei52@163.com
+
+    ENV ZK_VERSION 3.4.12
+
+    RUN apt-get update -q && apt-get install curl -y -q && \
+        curl -sLo /tmp/zookeeper-${ZK_VERSION}.tar.gz http://mirror.bit.edu.cn/apache/zookeeper/zookeeper-${ZK_VERSION}/zookeeper-${ZK_VERSION}.tar.gz && \
+        tar xf /tmp/zookeeper-${ZK_VERSION}.tar.gz -C / && \
+        apt-get clean && rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/*
+    RUN mv /zookeeper-${ZK_VERSION}/conf/zoo_sample.cfg /zookeeper-${ZK_VERSION}/conf/zoo.cfg
+    CMD /zookeeper-${ZK_VERSION}/bin/zkServer.sh start-foreground
+    EXPOSE 2181
+
+    ==================================================================================================
+
+    注意： “zkServer.sh start-foreground” 前台运行模式，否则zk刚启动，docker就退出了
+
+2. 创建镜像
+    $ docker build -t haoyoyo/zookeeper .
+
+3. 运行容器
+    $ docker run -p 2181:2181 haoyoyo/zookeeper
+
+4. 客户端连接验证：
+    $ docker exec -it b301f959ec6c bash
+    # bin/zkCli.sh -server 127.0.0.1:2181

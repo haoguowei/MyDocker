@@ -1,0 +1,13 @@
+1. 运行ELK docker-compose
+    $ docker-compose up
+
+
+2. 若 quay.io/coreos/etcd:v3.3.6 拉取失败，可使用网易镜像 hub.c.163.com/haoyoyo/etcd:v3.3.6
+
+3. 启动后验证：
+
+    $ docker ps
+    $ docker exec -it a3fac9d58b74 bin/sh
+    # etcdctl member list
+
+4. java 客户端：https://github.com/coreos/jetcd

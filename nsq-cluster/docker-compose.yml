@@ -1,0 +1,49 @@
+version : "3"
+services : 
+        nsqlookupdA : 
+                image : nsqio/nsq
+                command : /nsqlookupd
+                ports :
+                        - "4160"
+                        - "4161"
+        nsqlookupdB :
+                image : nsqio/nsq
+                command : /nsqlookupd
+                ports :
+                        - "4160"
+                        - "4161"
+        nsqdA :
+                image : nsqio/nsq
+                command : /nsqd --lookupd-tcp-address=nsqlookupdA:4160,nsqlookupdB:4160
+                depends_on : 
+                        - nsqlookupdA
+                        - nsqlookupdB
+                ports :
+                        - "4150"
+                        - "4151"
+        nsqdB :
+                image : nsqio/nsq
+                command : /nsqd --lookupd-tcp-address=nsqlookupdA:4160,nsqlookupdB:4160
+                depends_on :
+                        - nsqlookupdA
+                        - nsqlookupdB
+                ports :
+                        - "4150"
+                        - "4151"
+        nsqdC :
+                image : nsqio/nsq
+                command : /nsqd --lookupd-tcp-address=nsqlookupdA:4160,nsqlookupdB:4160
+                depends_on :
+                        - nsqlookupdA
+                        - nsqlookupdB
+                ports :
+                        - "4150"
+                        - "4151"
+        nsqadmin :
+                image : nsqio/nsq
+                command : /nsqadmin --lookupd-http-address=nsqlookupdA:4161,nsqlookupdB:4161
+                depends_on :
+                        - nsqlookupdA
+                        - nsqlookupdB
+                ports :
+                        - "4171"

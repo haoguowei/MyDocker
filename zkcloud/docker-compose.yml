@@ -1,0 +1,29 @@
+version : "3"
+services :
+        zkserver1 :
+                build : ./zookeeper
+                volumes :
+                        - "./zk-data1/:/zk-data/"
+                        - "./zoo.cfg:/zookeeper/conf/zoo.cfg"
+                ports :
+                        - "2181"
+                        - "2182"
+                        - "2183"
+        zkserver2 :
+                build : ./zookeeper
+                volumes :
+                        - "./zk-data2/:/zk-data/"
+                        - "./zoo.cfg:/zookeeper/conf/zoo.cfg"
+                ports :
+                        - "2181"
+                        - "2182"
+                        - "2183"
+        zkserver3 :
+                build : ./zookeeper
+                volumes :
+                        - "./zk-data3/:/zk-data/"
+                        - "./zoo.cfg:/zookeeper/conf/zoo.cfg"
+                ports :
+                        - "2181"
+                        - "2182"
+                        - "2183"

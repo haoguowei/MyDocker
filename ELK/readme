@@ -1,0 +1,33 @@
+1. 运行ELK docker-compose
+    $ docker-compose up
+
+
+2. 安装Filebeat
+
+    a. 下载解压：https://www.elastic.co/guide/en/beats/filebeat/6.2/filebeat-installation.html
+        $ curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-6.3.0-darwin-x86_64.tar.gz
+        $ tar xzvf filebeat-6.3.0-darwin-x86_64.tar.gz
+
+    b. 配置filebeat.yml
+
+       ==================================================================================================
+        filebeat.inputs:
+        - type: log
+          paths:
+            - /Users/haoguowei/MyDocker/elk/*.log
+
+          ....
+
+        output.elasticsearch:
+          # Array of hosts to connect to.
+          hosts: ["localhost:9200"]
+       ==================================================================================================
+
+    c. 运行
+        $ ./filebeat -e -c filebeat.yml -d "publish"
+
+    d. 在/Users/haoguowei/MyDocker/elk/目录下创建一个日志文件，写入测试数据。
+
+    e. 访问kibana：http://localhost:5601
+
+    f. kibana中创建索引 filebeat-* , 并搜索验证
