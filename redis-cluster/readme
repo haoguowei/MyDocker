@@ -1,9 +1,73 @@
-  echo yes | docker run -i --rm --net redis_redis_net ruby sh -c '\
-    gem install redis \
-    && wget http://download.redis.io/redis-stable/src/redis-trib.rb \
-    && ruby redis-trib.rb create --replicas 1 \
-     172.14.238.101:6379 172.14.238.102:6379 172.14.238.103:6379 \
-     172.14.238.104:6379 172.14.238.105:6379 172.14.238.106:6379'
+启动节点：
+    $ docker-compose up
+
+创建集群：启动一个新的容器，里面执行ruby脚本：
+
+    $ docker run -it --net redis_redis_net --ip 172.14.238.100  hub.c.163.com/haoyoyo/ruby-redis-trib sh
+
+    # ruby redis-trib.rb create --replicas 1 \
+         172.14.238.101:6379 172.14.238.102:6379 172.14.238.103:6379 \
+         172.14.238.104:6379 172.14.238.105:6379 172.14.238.106:6379
+
+    ==================================================================
+    > > >>> Creating cluster
+    >>> Performing hash slots allocation on 6 nodes...
+    Using 3 masters:
+    172.14.238.101:6379
+    172.14.238.102:6379
+    172.14.238.103:6379
+    Adding replica 172.14.238.105:6379 to 172.14.238.101:6379
+    Adding replica 172.14.238.106:6379 to 172.14.238.102:6379
+    Adding replica 172.14.238.104:6379 to 172.14.238.103:6379
+    ....
+    Can I set the above configuration? (type 'yes' to accept): yes
+    ....
+    [OK] All nodes agree about slots configuration.
+    >>> Check for open slots...
+    >>> Check slots coverage...
+    [OK] All 16384 slots covered.
+    ==================================================================
+
+验证：
+     1. 登录其中一台机器：
+        $ docker exec -it 1c3fecfdb4f1 redis-cli -c  （注意 -c 为集群模式）
+        127.0.0.1:6379> set abc 12345
+        OK
+
+     2. 登录其他机器验证：
+        $ docker exec -it 5324ae8601d2 redis-cli -c
+        127.0.0.1:6379> get abc
+        -> Redirected to slot [7638] located at 172.14.238.102:6379
+        "12345"
+
+redis.conf 主要配置：
+
+    port 6379
+
+    #打开实例的集群模式
+    cluster-enabled yes
+
+    #设定了保存节点配置文件的路径， 默认值为 nodes.conf.节点配置文件无须人为修改，
+    #它由 Redis 集群在启动时创建， 并在有需要时自动进行更新
+    cluster-config-file nodes.conf
+    cluster-node-timeout 5000
+
+    #是否持久化
+    appendonly yes
+
+    protected-mode no
+    # bind 127.0.0.1
 
 
-     [OK] All 16384 slots covered
+遇到的问题：
+
+    1. 启动报错：[ERR] Sorry, can't connect to node 192.168.X.X
+
+        原因：redis默认只允许本地访问，要使redis可以远程访问可以修改redis.conf
+
+        解决办法：注释掉bind 127.0.0.1可以使所有的ip访问redis
+
+        若是想指定多个ip访问，但并不是全部的ip访问，可以bind
+
+        在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redisd时候还是报错
+        修改办法：protected-mode no
