@@ -1,47 +1,125 @@
-启动节点：
+1. 启动docker-compose
     $ docker-compose up
 
-创建集群：启动一个新的容器，里面执行ruby脚本：
+2. 创建redis-cluster
 
-    $ docker run -it --net redis_redis_net --ip 172.14.238.100  hub.c.163.com/haoyoyo/ruby-redis-trib sh
+   2-1. 启动一个新的容器hub.c.163.com/haoyoyo/ruby-redis-trib
+        $ docker run -it --net redis_redis_net --ip 172.14.238.100  hub.c.163.com/haoyoyo/ruby-redis-trib sh
 
-    # ruby redis-trib.rb create --replicas 1 \
-         172.14.238.101:6379 172.14.238.102:6379 172.14.238.103:6379 \
-         172.14.238.104:6379 172.14.238.105:6379 172.14.238.106:6379
+   2-2. 在容器中，执行ruby脚本，创建集群：
+        # ruby redis-trib.rb create --replicas 1 \
+             172.14.238.101:6379 172.14.238.102:6379 172.14.238.103:6379 \
+             172.14.238.104:6379 172.14.238.105:6379 172.14.238.106:6379
 
-    ==================================================================
-    > > >>> Creating cluster
-    >>> Performing hash slots allocation on 6 nodes...
-    Using 3 masters:
-    172.14.238.101:6379
-    172.14.238.102:6379
-    172.14.238.103:6379
-    Adding replica 172.14.238.105:6379 to 172.14.238.101:6379
-    Adding replica 172.14.238.106:6379 to 172.14.238.102:6379
-    Adding replica 172.14.238.104:6379 to 172.14.238.103:6379
-    ....
-    Can I set the above configuration? (type 'yes' to accept): yes
-    ....
+
+3. 启动另外两个redis节点
+    ============================================================================
+    $ docker run --network redis_redis_net -it --ip 172.14.238.109 redis-my
+    $ docker run --network redis_redis_net -it --ip 172.14.238.110 redis-my
+    ============================================================================
+
+
+4. 将新的主节点加入到集群 (在hub.c.163.com/haoyoyo/ruby-redis-trib中执行)
+    ============================================================================
+    # ruby redis-trib.rb add-node 172.14.238.109:6379 172.14.238.101:6379
+    ============================================================================
+
+    # ruby redis-trib.rb add-node 172.14.238.109:6379 172.14.238.101:6379
+    >>> Adding node 172.14.238.109:6379 to cluster 172.14.238.101:6379
+    >>> Performing Cluster Check (using node 172.14.238.101:6379)
+    M: fa5a1d578a2aa8c4c966f0534522c19238342b16 172.14.238.101:6379
+       slots:0-5460 (5461 slots) master
+       1 additional replica(s)
+    M: 7a24fc06cfae88677c0197800d4ef16a5f1fe0f6 172.14.238.102:6379
+       slots:5461-10922 (5462 slots) master
+       1 additional replica(s)
+    S: 8162b084aa5386b6ac49ca9ee185ded95cc03df1 172.14.238.106:6379
+       slots: (0 slots) slave
+       replicates 7a24fc06cfae88677c0197800d4ef16a5f1fe0f6
+    S: b5b8493b06b11b0d1bc1aab0ed1ef71ec7401c01 172.14.238.105:6379
+       slots: (0 slots) slave
+       replicates fa5a1d578a2aa8c4c966f0534522c19238342b16
+    M: 908011689ca0855696f9c9de08ff99b0c575aa0b 172.14.238.103:6379
+       slots:10923-16383 (5461 slots) master
+       1 additional replica(s)
+    S: 2b04ccb7e3ec9022c6520bdf63b6c4f7da9e7709 172.14.238.104:6379
+       slots: (0 slots) slave
+       replicates 908011689ca0855696f9c9de08ff99b0c575aa0b
     [OK] All nodes agree about slots configuration.
     >>> Check for open slots...
     >>> Check slots coverage...
     [OK] All 16384 slots covered.
-    ==================================================================
+    >>> Send CLUSTER MEET to node 172.14.238.109:6379 to make it join the cluster.
+    [OK] New node added correctly.
 
-验证：
-     1. 登录其中一台机器：
+
+5. 将新的从节点加入到集群(在hub.c.163.com/haoyoyo/ruby-redis-trib中执行)
+    ============================================================================
+    # ruby redis-trib.rb add-node --slave 172.14.238.110:6379 172.14.238.101:6379
+    ============================================================================
+
+    # ruby redis-trib.rb add-node --slave 172.14.238.110:6379 172.14.238.101:6379
+    >>> Adding node 172.14.238.110:6379 to cluster 172.14.238.101:6379
+    >>> Performing Cluster Check (using node 172.14.238.101:6379)
+    M: fa5a1d578a2aa8c4c966f0534522c19238342b16 172.14.238.101:6379
+       slots:0-5460 (5461 slots) master
+       1 additional replica(s)
+    M: 7a24fc06cfae88677c0197800d4ef16a5f1fe0f6 172.14.238.102:6379
+       slots:5461-10922 (5462 slots) master
+       1 additional replica(s)
+    M: d05ec711f1dd3c36a61e56f7a849f8cb443a0886 172.14.238.109:6379
+       slots: (0 slots) master
+       0 additional replica(s)
+    S: 8162b084aa5386b6ac49ca9ee185ded95cc03df1 172.14.238.106:6379
+       slots: (0 slots) slave
+       replicates 7a24fc06cfae88677c0197800d4ef16a5f1fe0f6
+    S: b5b8493b06b11b0d1bc1aab0ed1ef71ec7401c01 172.14.238.105:6379
+       slots: (0 slots) slave
+       replicates fa5a1d578a2aa8c4c966f0534522c19238342b16
+    M: 908011689ca0855696f9c9de08ff99b0c575aa0b 172.14.238.103:6379
+       slots:10923-16383 (5461 slots) master
+       1 additional replica(s)
+    S: 2b04ccb7e3ec9022c6520bdf63b6c4f7da9e7709 172.14.238.104:6379
+       slots: (0 slots) slave
+       replicates 908011689ca0855696f9c9de08ff99b0c575aa0b
+    [OK] All nodes agree about slots configuration.
+    >>> Check for open slots...
+    >>> Check slots coverage...
+    [OK] All 16384 slots covered.
+    Automatically selected master 172.14.238.109:6379
+    >>> Send CLUSTER MEET to node 172.14.238.110:6379 to make it join the cluster.
+    Waiting for the cluster to join.
+    >>> Configure node as replica of 172.14.238.109:6379.
+    [OK] New node added correctly.
+
+6. 查看集群情况(在任一redis节点中执行)
+    ============================================================================
+    # redis-cli -c cluster nodes
+    ============================================================================
+    8162b084aa5386b6ac49ca9ee185ded95cc03df1 172.14.238.106:6379@16379 slave 7a24fc06cfae88677c0197800d4ef16a5f1fe0f6 0 1529913933516 2 connected
+    7a24fc06cfae88677c0197800d4ef16a5f1fe0f6 172.14.238.102:6379@16379 master - 0 1529913932000 2 connected 5461-10922
+    4b0356546cf6905ad42a0bd4280db2b65a07281d 172.14.238.110:6379@16379 myself,slave d05ec711f1dd3c36a61e56f7a849f8cb443a0886 0 1529913930000 7 connected
+    fa5a1d578a2aa8c4c966f0534522c19238342b16 172.14.238.101:6379@16379 master - 0 1529913932601 1 connected 0-5460
+    2b04ccb7e3ec9022c6520bdf63b6c4f7da9e7709 172.14.238.104:6379@16379 slave 908011689ca0855696f9c9de08ff99b0c575aa0b 0 1529913932499 3 connected
+    908011689ca0855696f9c9de08ff99b0c575aa0b 172.14.238.103:6379@16379 master - 0 1529913932000 3 connected 10923-16383
+    d05ec711f1dd3c36a61e56f7a849f8cb443a0886 172.14.238.109:6379@16379 master - 0 1529913932601 0 connected
+    b5b8493b06b11b0d1bc1aab0ed1ef71ec7401c01 172.14.238.105:6379@16379 slave fa5a1d578a2aa8c4c966f0534522c19238342b16 0 1529913931486 1 connected
+
+
+7. 验证：
+     7-1. 登录其中一台机器：
         $ docker exec -it 1c3fecfdb4f1 redis-cli -c  （注意 -c 为集群模式）
         127.0.0.1:6379> set abc 12345
         OK
 
-     2. 登录其他机器验证：
+     7-2. 登录其他机器验证：
         $ docker exec -it 5324ae8601d2 redis-cli -c
         127.0.0.1:6379> get abc
         -> Redirected to slot [7638] located at 172.14.238.102:6379
         "12345"
 
-redis.conf 主要配置：
-
+8. redis.conf 主要配置：
+   ============================================================================
     port 6379
 
     #打开实例的集群模式
@@ -57,17 +135,17 @@ redis.conf 主要配置：
 
     protected-mode no
     # bind 127.0.0.1
+   ============================================================================
 
+9. 遇到的问题：
 
-遇到的问题：
+   启动报错：[ERR] Sorry, can't connect to node 192.168.X.X
 
-    1. 启动报错：[ERR] Sorry, can't connect to node 192.168.X.X
+   原因：redis默认只允许本地访问，要使redis可以远程访问可以修改redis.conf
 
-        原因：redis默认只允许本地访问，要使redis可以远程访问可以修改redis.conf
+   解决办法：注释掉bind 127.0.0.1可以使所有的ip访问redis
 
-        解决办法：注释掉bind 127.0.0.1可以使所有的ip访问redis
+       若是想指定多个ip访问，但并不是全部的ip访问，可以bind
 
-        若是想指定多个ip访问，但并不是全部的ip访问，可以bind
-
-        在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redisd时候还是报错
-        修改办法：protected-mode no
+       在redis3.2之后，redis增加了protected-mode，在这个模式下，即使注释掉了bind 127.0.0.1，再访问redisd时候还是报错
+       修改办法：protected-mode no
