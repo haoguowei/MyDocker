@@ -3,6 +3,6 @@ services :
         redis :
                 image : redis:4.0
                 volumes :
-                        - ./data:/data
+                        - ./redis-data:/data
                 ports :
                         - 6379
