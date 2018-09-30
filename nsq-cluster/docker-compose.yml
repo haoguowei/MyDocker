@@ -1,43 +1,49 @@
 version : "3"
-services : 
+services :
         nsqlookupd-A :
                 image : nsqio/nsq
                 command : /nsqlookupd
                 ports :
                         - "4160"
-                        - "4161"
+                        - "24161:4161"
         nsqlookupd-B :
                 image : nsqio/nsq
                 command : /nsqlookupd
                 ports :
                         - "4160"
-                        - "4161"
+                        - "34161:4161"
         nsqd-A :
                 image : nsqio/nsq
-                command : /nsqd --lookupd-tcp-address=nsqlookupd-A:4160,nsqlookupd-B:4160
-                depends_on : 
+                command : /nsqd --lookupd-tcp-address=nsqlookupd-A:4160,nsqlookupd-B:4160 --data-path=/data
+                volumes :
+                        - ./nsqd-A-data:/data
+                depends_on :
                         - nsqlookupd-A
                         - nsqlookupd-B
                 ports :
-                        - "4150"
+                        - "24150:4150"
                         - "4151"
         nsqd-B :
                 image : nsqio/nsq
-                command : /nsqd --lookupd-tcp-address=nsqlookupd-A:4160,nsqlookupd-B:4160
+                command : /nsqd --lookupd-tcp-address=nsqlookupd-A:4160,nsqlookupd-B:4160 --data-path=/data
+                volumes :
+                        - ./nsqd-B-data:/data
                 depends_on :
                         - nsqlookupd-A
                         - nsqlookupd-B
                 ports :
-                        - "4150"
+                        - "34150:4150"
                         - "4151"
         nsqd-C :
                 image : nsqio/nsq
-                command : /nsqd --lookupd-tcp-address=nsqlookupd-A:4160,nsqlookupd-B:4160
+                command : /nsqd --lookupd-tcp-address=nsqlookupd-A:4160,nsqlookupd-B:4160 --data-path=/data
+                volumes :
+                        - ./nsqd-C-data:/data
                 depends_on :
                         - nsqlookupd-A
                         - nsqlookupd-B
                 ports :
-                        - "4150"
+                        - "44150:4150"
                         - "4151"
         nsqadmin :
                 image : nsqio/nsq
