@@ -1,0 +1,56 @@
+version : "3"
+services :
+        my-eureka-server-A :
+                image : java:8
+                command : java -jar /webapp.jar --spring.profiles.active=peerA
+                volumes :
+                        - ./my-eureka-server-0.0.1-SNAPSHOT.jar:/webapp.jar
+                ports :
+                        - "28761:8761"
+        my-eureka-server-B :
+                image : java:8
+                command : java -jar /webapp.jar --spring.profiles.active=peerB
+                volumes :
+                        - ./my-eureka-server-0.0.1-SNAPSHOT.jar:/webapp.jar
+                ports :
+                        - "38761:8761"
+        my-eureka-server-C :
+                image : java:8
+                command : java -jar /webapp.jar --spring.profiles.active=peerC
+                volumes :
+                        - ./my-eureka-server-0.0.1-SNAPSHOT.jar:/webapp.jar
+                ports :
+                        - "48761:8761"
+        my-eureka-client-A :
+                image : java:8
+                command : java -jar /webapp.jar
+                depends_on :
+                        - my-eureka-server-A
+                        - my-eureka-server-B
+                        - my-eureka-server-C
+                volumes :
+                        - ./my-eureka-client-0.0.1-SNAPSHOT.jar:/webapp.jar
+                ports :
+                        - "28763:8763"
+        my-eureka-client-B :
+                image : java:8
+                command : java -jar /webapp.jar
+                depends_on :
+                        - my-eureka-server-A
+                        - my-eureka-server-B
+                        - my-eureka-server-C
+                volumes :
+                        - ./my-eureka-client-0.0.1-SNAPSHOT.jar:/webapp.jar
+                ports :
+                        - "38763:8763"
+        my-feign :
+                image : java:8
+                command : java -jar /webapp.jar
+                depends_on :
+                        - my-eureka-server-A
+                        - my-eureka-server-B
+                        - my-eureka-server-C
+                volumes :
+                        - ./my-feign-0.0.1-SNAPSHOT.jar:/webapp.jar
+                ports :
+                        - "8765:8765"
