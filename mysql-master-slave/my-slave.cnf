@@ -1,0 +1,13 @@
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+[mysqld]
+server-id=2
+log_bin=mysql-bin
+relay-log=mysql-relay-bin
+log_slave_updates=1
+read_only=1
+character_set_server=utf8
