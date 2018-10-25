@@ -47,7 +47,7 @@ mysql 主从复制 master-slave
     mysql> change master to master_host='mysql-master',
         -> master_user='backup',
         -> master_password='123456',
-        -> master_log_file='mysql-bin.000002',
+        -> master_log_file='mysql-bin.000004', (master运行SHOW MASTER STATUS可查看到)
         -> master_log_pos=0;
 
     MASTER_LOG_POS的值为0，因为它是日志的开始位置。

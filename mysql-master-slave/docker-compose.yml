@@ -3,9 +3,9 @@ services :
         mysql-master :
                 image : mysql:5.6
                 volumes :
-                        - ./init.sql:/docker-entrypoint-initdb.d/init.sql
                         - ./my-master.cnf:/etc/mysql/my.cnf
-                        - ./mysql-data-master:/var/lib/mysql
+                        - ./init-master.sql:/docker-entrypoint-initdb.d/init.sql
+                        - ./mysql-data-master:/data/mysql
                 environment :
                         - MYSQL_ROOT_PASSWORD=123456
                 ports :
@@ -13,9 +13,9 @@ services :
         mysql-slave :
                 image : mysql:5.6
                 volumes :
-                        - ./init.sql:/docker-entrypoint-initdb.d/init.sql
                         - ./my-slave.cnf:/etc/mysql/my.cnf
-                        - ./mysql-data-slave:/var/lib/mysql
+                        - ./init-slave.sql:/docker-entrypoint-initdb.d/init.sql
+                        - ./mysql-data-slave:/data/mysql
                 environment :
                         - MYSQL_ROOT_PASSWORD=123456
                 ports :
