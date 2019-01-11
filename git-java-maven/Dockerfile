@@ -19,7 +19,7 @@ RUN mkdir /deploy \
     && cd docker-demo \
     && mvn clean install -DskipTests
 
-
+# 多阶段构建
 FROM java:8 AS run
 EXPOSE 8080
 COPY --from=package /deploy/docker-demo/target/docker-demo-0.0.1-SNAPSHOT.jar .
