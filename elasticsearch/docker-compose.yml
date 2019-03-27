@@ -6,35 +6,30 @@ services :
                         - "./es-data1:/usr/share/elasticsearch/data"
                 environment :
                         - cluster.name=elasticsearch-cluster
+                        - node.name=elasticsearch1
                         - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+                        - "discovery.zen.ping.unicast.hosts=elasticsearch1:9300,elasticsearch2:9300,elasticsearch3:9300"
                 ports :
-                        - 9200:9200
-                networks :
-                        - es_net
+                  - 9201:9200
         elasticsearch2 :
                 image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
                 volumes :
                         - "./es-data2:/usr/share/elasticsearch/data"
                 environment :
                         - cluster.name=elasticsearch-cluster
+                        - node.name=elasticsearch2
                         - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-                        - "discovery.zen.ping.unicast.hosts=elasticsearch1"
-                networks :
-                        - es_net
+                        - "discovery.zen.ping.unicast.hosts=elasticsearch1:9300,elasticsearch2:9300,elasticsearch3:9300"
+                ports:
+                  - 9202:9200
         elasticsearch3 :
                 image : hub.c.163.com/haoyoyo/elasticsearch:6.3.0
                 volumes :
                         - "./es-data3:/usr/share/elasticsearch/data"
                 environment :
                         - cluster.name=elasticsearch-cluster
+                        - node.name=elasticsearch3
                         - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-                        - "discovery.zen.ping.unicast.hosts=elasticsearch1"
-                networks :
-                        - es_net
-networks :
-        es_net :
-                driver : bridge
-                ipam : 
-                        driver : default
-                        config : 
-                        - subnet : 172.15.238.0/24
+                        - "discovery.zen.ping.unicast.hosts=elasticsearch1:9300,elasticsearch2:9300,elasticsearch3:9300"
+                ports:
+                  - 9203:9200

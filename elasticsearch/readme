@@ -6,9 +6,9 @@
 
    ==================================================================================================
 
-   ip           heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
-   172.15.238.3           35          93  19    3.31    1.64     0.84 mdi       -      T-k1CZU
-   172.15.238.2           30          93  18    3.31    1.64     0.84 mdi       *      1Pejxnw
-   172.15.238.4           36          93  18    3.31    1.64     0.84 mdi       -      ykK8LFL
+   ip         heap.percent ram.percent cpu load_1m load_5m load_15m node.role master name
+   172.18.0.4           30          97   7    2.79    2.01     1.25 mdi       *      elasticsearch2
+   172.18.0.2           28          97   7    2.79    2.01     1.25 mdi       -      elasticsearch3
+   172.18.0.3           30          97   7    2.79    2.01     1.25 mdi       -      elasticsearch1
 
    ==================================================================================================
